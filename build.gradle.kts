@@ -8,7 +8,6 @@ plugins {
     kotlin("plugin.spring") version "1.8.22"
     kotlin("plugin.jpa") version "1.8.22"
     kotlin("kapt") version "1.8.22"
-
 }
 
 group = "com.fastcampus"
@@ -47,4 +46,8 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.named<Jar>("jar") {
+    enabled = false
 }
