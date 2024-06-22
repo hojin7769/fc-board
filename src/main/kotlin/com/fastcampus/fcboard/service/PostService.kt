@@ -1,6 +1,7 @@
 package com.fastcampus.fcboard.service
 
-import com.fastcampus.fcboard.exception.PostNotFundException
+import com.fastcampus.fcboard.exception.PostNotDeletableException
+import com.fastcampus.fcboard.exception.PostNotFoundException
 import com.fastcampus.fcboard.repository.PostRepository
 import com.fastcampus.fcboard.service.dto.PostCreateRequestDto
 import com.fastcampus.fcboard.service.dto.PostUpdateRequestDto
@@ -22,8 +23,20 @@ class PostService(
 
     @Transactional
     fun updatePost(id: Long, requestDto: PostUpdateRequestDto):Long{
-        val post = postRepository.findByIdOrNull(id) ?: throw PostNotFundException()
+        val post = postRepository.findByIdOrNull(id) ?: throw PostNotFoundException()
         post.update(requestDto)
         return id
     }
+
+    @Transactional
+    fun deletePost(id: Long, deletedBy: String): Long {
+        val post = postRepository.findByIdOrNull(id) ?: throw PostNotFoundException()
+        if (post.createdBy != deletedBy) throw PostNotDeletableException()
+        postRepository.delete(post)
+        return id
+    }
+
+
+
+
 }

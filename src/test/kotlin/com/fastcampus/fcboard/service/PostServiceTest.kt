@@ -1,6 +1,7 @@
 package com.fastcampus.fcboard.service
 
 import com.fastcampus.fcboard.domain.Post
+import com.fastcampus.fcboard.exception.PostNotDeletableException
 import com.fastcampus.fcboard.exception.PostNotFoundException
 import com.fastcampus.fcboard.exception.PostNotUpdatableException
 import com.fastcampus.fcboard.repository.PostRepository
@@ -75,14 +76,18 @@ class PostServiceTest(
     }
 
     given("게시글 삭제시") {
+        val saved = postRepository.save(Post(title = "title", content = "content", createdBy = "harris"))
         When("정상 삭제시") {
+            val postId = postService.deletePost(saved.id, "harris")
             then("게시글이 정상적으로 삭제됨을 확인한다") {
-
+                postId shouldBe saved.id
+                postRepository.findByIdOrNull(postId) shouldBe null
             }
         }
-        When("작성자가 동일하지 않으면") {
-            then("삭제할 수 없는 게시물 입니다 예외가 발생한다.") {
-
+        When("작성자가 동일하지 않으면"){
+            val saved2 = postRepository.save(Post(title = "title", content = "content", createdBy = "harris"))
+            then("삭제할 수 없는 게시물 입니다 예외가 발생한다."){
+                shouldThrow<PostNotDeletableException> { postService.deletePost(saved2.id, "harris2") }
             }
         }
     }
